@@ -81,7 +81,7 @@ class FlxSand extends FlxSprite
 
 		var moved:Bool = false;
 
-		for (y in 0...Std.int(height))
+		for (y in 0...Std.int(height + 1))
 		{
 			var posY:Int = Std.int(height) - y;
 
@@ -118,23 +118,20 @@ class FlxSand extends FlxSprite
 					var sRD:Bool = checkSand(s.position.x + 1, s.position.y + 1);
 					var sL:Bool = checkSand(s.position.x - 1, s.position.y);
 					var sR:Bool = checkSand(s.position.x + 1, s.position.y);
+					var sU:Bool = checkSand(s.position.x, s.position.y - 1);
+					var sLU:Bool = checkSand(s.position.x - 1, s.position.y - 1);
+					var sRU:Bool = checkSand(s.position.x + 1, s.position.y - 1);
 
-					// move left if there is no sand 1 space to the left and no sand 1 space to the left and one space down
-					var anyLeft:Bool = false;
-					var anyRight:Bool = false;
-
-					if (x <= 0 || sL || sLD)
+					canMoveRight = ((sLU || sU) && !sR && !sRD);
+					canMoveLeft = ((sRU || sU) && !sL && !sLD);
+					if (s.position.x == 0)
 					{
-						anyLeft = true;
+						canMoveLeft = false;
 					}
-
-					if (x > width || sR || sRD)
+					if (s.position.x == width - 1)
 					{
-						anyRight = true;
+						canMoveRight = false;
 					}
-
-					canMoveLeft = !anyLeft;
-					canMoveRight = !anyRight;
 
 					if (canMoveLeft || canMoveRight)
 					{

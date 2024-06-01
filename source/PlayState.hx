@@ -19,7 +19,8 @@ class PlayState extends FlxState
 		{
 			for (y in 0...16)
 			{
-				pattern.push(new SandDef(x, y, y > 14 ? FlxG.random.float(0.2, 0.4) : FlxG.random.float(0.6, 0.8)));
+				pattern.push(new SandDef(x, y, y >= 14 || x >= 14 ? FlxG.random.float(0.2,
+					0.3) : y < 1 || x < 1 ? FlxG.random.float(0.6, 0.7) : FlxG.random.float(0.4, 0.5)));
 			}
 		}
 	}
@@ -33,12 +34,12 @@ class PlayState extends FlxState
 		sand = new axolstudio.FlxSand(0, 0, FlxG.width, FlxG.height);
 		add(sand);
 
-		// var timer:FlxTimer = new FlxTimer();
-		// timer.start(.02, (_) ->
-		// {
-		// 	var x:Int = FlxG.random.int(0, Std.int(FlxG.width));
-		// 	sand.addSand(FlxPoint.weak(x, 0), FlxMath.lerp(0, 359, x / FlxG.width), FlxG.random.float(0.25, 0.75));
-		// }, 0);
+		var timer:FlxTimer = new FlxTimer();
+		timer.start(.02, (_) ->
+		{
+			var x:Int = FlxG.random.int(0, Std.int(FlxG.width));
+			sand.addSand(FlxPoint.weak(x, 0), FlxMath.lerp(0, 359, x / FlxG.width), FlxG.random.float(0.25, 0.75));
+		}, 0);
 
 		super.create();
 	}
