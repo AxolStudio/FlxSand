@@ -38,6 +38,8 @@ jobs:
                 run: haxelib install lime --quiet
             -   name: Setup Lime
                 run: haxelib run lime setup -y
+            -   name: Install HaxeFlixel
+                run: haxelib install flixel --quiet
             -   name: build project
                 run: lime build html5 -clean -final
             -   name: Setup Pages
