@@ -4,14 +4,17 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.math.FlxPoint;
+import flixel.system.FlxAssets.FlxShader;
 import flixel.util.FlxColor;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 
 class FlxSand extends FlxSprite
 {
+	#if debug
 	private var sandCount:Int = 0;
 	private var sandDrawn:Int = 0;
+	#end
 
 	public var bgColor:FlxColor = FlxColor.TRANSPARENT;
 
@@ -41,11 +44,13 @@ class FlxSand extends FlxSprite
 		sand = [];
 		newSand = [];
 
+		#if debug
 		FlxG.watch.add(this, "sandCount");
 		FlxG.watch.add(this, "sandDrawn");
+		#end
 	}
 
-	public function addSand(Position:FlxPoint, Hue:Float, Lightness:Float, Weight:Float = 1):Void
+	public function addSand(Position:FlxPoint, Color:FlxColor, Locked:Bool = false, Weight:Float = 1):Void
 	{
 		if (Position.x < 0 || Position.x >= width || Position.y < 0 || Position.y >= height)
 			return;
@@ -53,7 +58,7 @@ class FlxSand extends FlxSprite
 		{
 			return;
 		}
-		newSand.push(new Sand(Position, Hue, Lightness, Weight));
+		newSand.push(new Sand(Position, Color, Locked, Weight));
 	}
 
 	public function removeSand(Position:FlxPoint):Void
@@ -87,8 +92,6 @@ class FlxSand extends FlxSprite
 
 			for (x in 0...Std.int(width))
 			{
-				// for (s in sand)
-				// {
 				var pos:FlxPoint = FlxPoint.weak(x, posY);
 				var s:Sand = sand.get(pos.toString());
 
@@ -98,6 +101,11 @@ class FlxSand extends FlxSprite
 				}
 
 				if (s.position.y >= height - 1)
+				{
+					continue;
+				}
+
+				if (s.locked)
 				{
 					continue;
 				}
@@ -176,25 +184,32 @@ class FlxSand extends FlxSprite
 
 	public function drawSand():Void
 	{
-		var newBMP:BitmapData = new BitmapData(Std.int(width), Std.int(height), true, bgColor);
+		// slow!!! how do I replace this with shader?
+		var newBMP:BitmapData = pixels;
+		// new BitmapData(Std.int(width), Std.int(height), true, bgColor);
 		newBMP.lock();
+		newBMP.fillRect(newBMP.rect, bgColor);
+		#if debug
 		sandDrawn = 0;
+		#end
 		for (s in sand)
 		{
 			var x:Int = Std.int(s.position.x);
 			var y:Int = Std.int(s.position.y);
 
-			var color:Int = FlxColor.fromHSL(s.hue, 1, s.lightness);
+			var color:Int = s.color;
 
 			if (x >= 0 && x < width && y >= 0 && y < height)
 			{
 				newBMP.setPixel32(x, y, color);
+				#if debug
 				sandDrawn++;
+				#end
 			}
 		}
 		newBMP.unlock();
-		pixels = newBMP;
-		dirty = true;
+		// pixels = newBMP;
+		// dirty = true;
 	}
 
 	override function draw()
@@ -207,15 +222,18 @@ class FlxSand extends FlxSprite
 class Sand
 {
 	public var position:FlxPoint;
-	public var hue:Float;
-	public var lightness:Float = .5;
-	public var weight:Float = 1;
 
-	public function new(Position:FlxPoint, Hue:Float, Lightness:Float, Weight:Float = 1):Void
+	public var color:FlxColor;
+	public var weight:Float = 1; // not yet used
+
+	public var locked:Bool = false;
+
+	public function new(Position:FlxPoint, Color:FlxColor, Locked:Bool = false, Weight:Float = 1):Void
 	{
 		position = Position;
-		hue = Hue;
-		lightness = Lightness;
+		color = Color;
 		weight = Weight;
+
+		locked = Locked;
 	}
 }
